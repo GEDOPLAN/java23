@@ -1,0 +1,20 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Maven
+target/
+*.log
+
+# JDK
+*.class
+*.jar
+*.war
+
+# JUnit
+junit-platform.properties
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
