@@ -11,17 +11,18 @@ import java.util.concurrent.StructuredTaskScope;
 public class StructuredConcurrency {
 
   public static void main(String[] args) throws ExecutionException, InterruptedException {
-//    executorService();
-    structuredConcurrencyShutdownOnFailure();
+    // findWithExecutorService();
+    findWithStructuredConcurrencyShutdownOnFailure();
+    // structuredConcurrencyShutdownOnSuccess();
   }
 
   // auf true setzen, um das Verhalten beim Fehlschlag von fetchOrder zu beobachten
   private static boolean failFetchingOrder = true;
 
-  public static void executorService() throws ExecutionException, InterruptedException {
+  public static void findWithExecutorService() throws ExecutionException, InterruptedException {
     System.out.println("--- ExecutorService ---");
     try (ExecutorService executorService = Executors.newCachedThreadPool()) {
-      var userFuture = executorService.submit(() -> findUser());
+      Future<String> userFuture = executorService.submit(() -> findUser());
       Future<Integer> orderFuture = executorService.submit(() -> fetchOrder());
 
       String user = userFuture.get();
@@ -32,18 +33,21 @@ public class StructuredConcurrency {
     }
   }
 
-  public static void structuredConcurrencyShutdownOnFailure() throws InterruptedException, ExecutionException {
+  public static void findWithStructuredConcurrencyShutdownOnFailure() throws InterruptedException, ExecutionException {
     System.out.println("--- Structured Concurrency ShutdownOnFailure ---");
 
     try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
-      var findUserTask = scope.fork(() -> findUser());
-      var fetchOrderTask = scope.fork(() -> fetchOrder());
+      var findUserSubtask = scope.fork(() -> findUser());
+      var fetchOrderSubtask = scope.fork(() -> fetchOrder());
 
-      scope.join() // blockiert, bis beide Teilaufgaben beendet sind
-           .throwIfFailed(); // ... Abbruch, wenn eine Teilaufgabe fehlschlägt
+      // wartet auf Abschluss aller Teilaufgaben
+      scope.join();
 
-      // beide Teilaufgaben erfolgreich, Ergebnisse zusammenführen
-      UserOrder userOrder = new UserOrder(findUserTask.get(), fetchOrderTask.get());
+      // Abbruch bei Fehler in einer Teilaufgabe
+      scope.throwIfFailed();
+
+      // Ergebnisse beider Teilaufgaben zusammenführen
+      UserOrder userOrder = new UserOrder(findUserSubtask.get(), fetchOrderSubtask.get());
       printWithThreadName("userOrder = " + userOrder);
     }
   }

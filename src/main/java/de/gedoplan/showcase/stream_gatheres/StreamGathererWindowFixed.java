@@ -11,7 +11,7 @@ public class StreamGathererWindowFixed {
   }
 
   static void windowFixed_hypothetical() {
-    // not possible, just hypothetically
+    // not possible, just hypothetical
     var result = Stream.iterate(0, i -> i + 1)
         // .windowFixed(4) // hypothetical
         .limit(3)
@@ -30,7 +30,7 @@ public class StreamGathererWindowFixed {
     var result2 = Stream.of(0, 1, 2, 3, 4, 5, 6)
         .gather(Gatherers.windowFixed(3))
         .toList();
-    // ==>[[0, 1, 2], [3, 4, 5], [6]]
+    // result ==>[[0, 1, 2], [3, 4, 5], [6]]
     System.out.println("windowFixed(3): " + result2);
   }
 
