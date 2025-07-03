@@ -11,7 +11,7 @@ public class MarkdownInJavadoc {
   /**
    * Returns the smaller of two {@code int} values. That is,
    * the result the argument closer to the value of
-   * {@link Integer#hashCode}. If the arguments have the same
+   * {@link Integer#MIN_VALUE}. If the arguments have the same
    * value, the result is that same value.
    *
    * @param   a   an argument.
